@@ -1,0 +1,16 @@
+{
+  "name": "ch02_webpack_basic",
+  "version": "1.0.0",
+  "description": "문법 수준에서 모듈을 지원하기 시작한 것은 ES2015 부터이다.\r import/export 구문이 없었던 무듈 이전 상황을 살펴보는 것이 웹팩 등장 배경을 설명하기 좋다.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.12"
+  }
+}

@@ -105,3 +105,95 @@ export 구문으로 모듈을 만들고 import 구문으로 가져올 수 있다
 app.js는 모듈을 사용할 수 있다.
 
 그러나 브라우져에 무관하게 사용하고 싶을 때가 있는데 이를 해결 해 주는 것이 웹팩이다.
+
+### 2. 엔트리/아웃풋
+
+웹팩은 여러개 파일을 하나의 파일로 합쳐주는 번들러(bundler)다. 하나의 시작점(entrypoint)으로 부터
+의존적인 모듈을 전부 찾아내서 하나의 결과물을 만들어낸다.
+app.js 부터 시작해 math.js 파일을 찾은 뒤 하나의 파일로 만드는 방식이다.
+
+- 번들작업을 하는 webpack 패키지와 웹팩 터미널 도구인 webpack-cli 를 설치
+
+```
+$ npm install -D webpack webpack-cli
+```
+
+- webpack --help 옵션으로 사용방법을 확인 해 보면
+
+```
+$ node_modules/.bin/webpack --help
+
+  --mode                 Enable production optimizations or development hints.
+                                     [선택: "development", "production", "none"]
+  --entry      The entry point(s) of the compilation.                   [문자열]
+  --output, -o                  The output path and file for compilation assets
+
+```
+
+위와 같이 나오는데
+
+--mode, --entry, --output 세 개 옵션만 사용하면 코드를 묶을 수 있다.
+
+- --mode: 웹팩 실행 모드를 의미하며 개발 버전인 development를 지정한다.
+- --entry: 시작점 경로를 지정하는 옵션이다.
+- --output: 번들링 결과물을 위치할 경로이다.
+
+```
+$ node_modules/.bin/webpack --mode development --entry ./src/app.js --output dist/main.js
+```
+
+위 명령어를 실행하면 dist/main.js 에 번들된 결과가 저장된다.
+이 코드를 index.html에 로딩하면 번들링 전과 똑같은 결과를 만든다.
+
+- index.html
+
+```
+<script src="dist/main.js"></script>
+```
+
+- --config 항목을 보면
+
+```
+$ node_modules/.bin/webpack --help
+
+  --config               Path to the config file
+                         [문자열] [기본: webpack.config.js or webpackfile.js]
+```
+
+이 옵션은 웹팩 설정파일의 경로를 지정할 수 있는데 기본 파일명이 webpack.config.js 혹은 webpackfile.js다
+
+- webpack.config.js
+
+```
+const path = require("path")
+
+module.exports = {
+  mode: "development",
+  entry: {
+    main: "./src/app.js",
+  },
+  output: {
+    filename: "[name].js",
+    path: path.resolve("./dist"),
+  },
+}
+```
+
+터미널에서 사용한 옵션인 mode, entry, ouput을 설정한다.
+
+- mode: development 문자열을 사용했다.
+- entry: 어플리케이션 진입점임 src/app.js 로 설정한다.
+- output: [name]은 entry에 추가한 main이 문자열로 들어오는 방식이다.
+  - output.path는 절대 경로를 사용하기 때문에 path 모듈의 resolve() 함수를 사용해서 계산했다. (path는 노드 코어 모듈 중 하나로 경로를 처리하는 기능을 제공한다)
+
+웹팩 실행을 위한 NPM 커스텀 명령어를 추가한다.
+
+- package.json
+
+```
+{
+  "scripts": {
+    "build": "./node_modules/.bin/webpack"
+  }
+}
+```
