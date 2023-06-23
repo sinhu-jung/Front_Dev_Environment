@@ -197,3 +197,60 @@ module.exports = {
   }
 }
 ```
+
+### 로더
+
+#### 1. 로더의 역할
+
+- 웹팩은 모든 파일을 모듈로 바라본다. 자바스크립트로 만든 모듈 뿐만아니라 스타일시트, 이미지, 폰트까지도 전부 모듈로 보기 때문에 import 구문을 사용하면 자바스크립트 코드 안으로 가져올수 있다.
+- 로더는 타입스크립트 같은 다른 언어를 자바스크립트 문법으로 변환해 주거나 이미지를 data URL 형식의 문자열로 변환한다. 뿐만아니라 CSS 파일을 자바스크립트에서 직접 로딩할수 있도록 해준다.
+
+#### 2. 커스텀 로더 만들기
+
+- myloader.js
+
+```
+module.exports = function myWebpackLoader(content) {
+  console.log("myWebpackLoader 가 동작함");
+  return content;
+};
+```
+
+- 함수로 만들수 있는데 로더가 읽은 파일의 내용이 함수 인자 content로 전달된다. 로더가 동작하는지 확인하는 용도로 로그만 찍고 곧장 content를 돌려 주며 로더를 사용하려면 웹팩 설정에서 module 객체에 추가한다.
+
+- webpack.config.js
+
+```
+  module: {
+   rules: [
+     {
+       test: /\.js$/, // 로더가 처리해야될 파일들의 패턴(정규 표현식)
+       use: [path.resolve("./my-webpack-loader.js")],
+     },
+   ],
+ },
+```
+
+- module.rules 배열에 모듈을 추가하는데 test와 use로 구성된 객체를 전달한다.
+
+- test에는 로딩에 적용할 파일을 지정한다. 파일명 뿐만아니라 파일 패턴을 정규표현식으로 지정할수 있는데 위 코드는 .js 확장자를 갖는 모든 파일을 처리하겠다는 의미다.
+
+- use에는 이 패턴에 해당하는 파일에 적용할 로더를 설정하는 부분이다. 방금 만든 my-webpack-loader 함수의 경로를 지정한다.
+
+빌드를 하게 되면 터미널에 myWebpackLoader 가 동작함이 2개가 적혀 있는 것을 볼 수 있는데 지금 만들어 놓은 파일은 app.js 와 app.js 에서 가져와서 사용하는 math.js 가 있다.
+test 에 적힌 규칙대로 .js 파일만 다 가져와서 로더가 돌기 때문에 2번이 찍히는 것이다.
+
+- 소스에 있는 모든 console.log() 함수를 alert() 함수로 변경하도록 로더를 변경해 보면 다음과 같다.
+
+- my-webpack-loader.js
+
+```
+module.exports = function myWebpackLoader(content) {
+  return content.replace("console.log(", "alert(");
+};
+
+```
+
+빌드 후 확인을 해보면 console.log 가 alert 로 변경 된 것을 알 수 있다.
+
+### 자주 사용하는 로더
