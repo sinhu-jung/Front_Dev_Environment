@@ -411,3 +411,46 @@ body {
 - 또한 name 옵션을 사용했는데 이것은 로더가 파일을 아웃풋에 복사할때 사용하는 파일 이름이다. 기본적으로 설정된 해쉬값을 쿼리스트링으로 옮겨서 'bg.png?해쉬코드' 형식으로 파일을 요청하도록 변경 했다.
 
 위와 같이 변경 후 잘 동작 하는 것을 볼 수 있다.
+
+#### 4. url-loader
+
+사용하는 이미지 갯수가 많다면 네트웍 리소스를 사용하는 부담이 있고 사이트 성능에 영향을 줄 수도 있다. 만약 한 페이지에서 작은 이미지를 여러 개 사용한다면 Data URI Scheme을 이용하는 방법이 더 나은 경우도 있다. 이미지를 Base64로 인코딩하여 문자열 형태로 소스코드에 넣는 형식이다.
+
+file-loader 가 적용 돼 있기 때문에 아래 코드도 똑같이 브라우저 상에서 동작 한다.
+
+```
+import nyancat from "../image/nyancat.jpg";
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.body.innerHTML = `
+        <img src="${nyancat}" />
+    `;
+});
+```
+
+하지만 nyancat.jpg는 bg.png 보다 상대적으로 작은 용량이므로
+바로 불러올 필요 없이 base64로 인코딩 해서 넣어야 더 효율 적이다.
+위와 같이 하려면 url-loader 를 사용해야 한다.
+
+- url-loader 다운로드
+
+```
+$ npm i -D url-loader // url-loader 는 v5에 지원 중단 돼서 그냥 다운 받음
+```
+
+- url-loader 웹팩 설정
+
+```
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        loader: "url-loader",
+        options: {
+          publicPath: "./dist/",
+          name: "[name].[ext]?[hash]",
+          limit: 2000, // 2kb
+        },
+      },
+```
+
+url-loader가 파일을 처리 할 때 2kb 이하의 파일은 url-loader 로 처리를 해서 base64로 변환 하고 만약 2kb 이상일 경우 file-loader 로 처리 한다.
+즉 2kb 미만일 경우 js 문자열로 변환하고 2kb 이상일 경우 파일을 복사한다.
