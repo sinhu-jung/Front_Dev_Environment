@@ -254,3 +254,85 @@ module.exports = function myWebpackLoader(content) {
 빌드 후 확인을 해보면 console.log 가 alert 로 변경 된 것을 알 수 있다.
 
 ### 자주 사용하는 로더
+
+#### 1. css-loader
+
+웹팩은 모든것을 모듈로 바라보며 자바스크립트 뿐만 아니라 스타일시트를 import 구문으로 불러올 수 있다.
+
+- app.js
+
+```
+import './app.css';
+```
+
+- app.css
+
+```
+body {
+  background-color: green;
+}
+```
+
+위의 코드를 빌드하게 되면 오류가 나는 것을 볼 수 있는데 자바스크립트에서 css 파일을 불러와서 사용하려면 css 모듈로 변환하는 작업이 필요하다.
+css-loader가 그러한 역할을 하며 우리 코드에서 css 파일을 모듈처럼 불러와 사용할 수 있게끔 해준다.
+
+따라서 css-loader를 사용하기 위해 설치
+
+```
+$ npm i -D css-loader@3 // webpack이 4버전이기 때문에 버전을 낮췄다.
+```
+
+설치 후 웹팩 설정에 로더를 추가해 준다.
+
+```
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.css$/, // .css 확장자로 끝나는 모든 파일
+        use: ["css-loader"], // css-loader를 적용한다
+      },
+    ],
+  },
+}
+```
+
+웹팩은 엔트리 포인트부터 시작해서 모듈을 검색하다가 CSS 파일을 찾으면 css-loader로 처리하며
+use.loader에 로더 경로를 설정하는 대신 배열에 로더 이름을 문자열로 전달해도 된다.
+
+하지만 위의 결과로 빌드 후 실행 해보면 background-color 가 변하지 않은것을 알 수 있는데
+HTML 태그가 DOM이라는 모습으로 변환 돼야 브라우저에서 문서가 보이듯이
+CSS 코드도 CSSOM 이라는 형태로 바뀌어야만 브라우저에서 보여진다.
+
+위와같이 적용하려면
+HTML 파일에서 css 코드를 직접 불러오거나
+인라인 스크립트로 넣어줘야 하는데 이와 같은 행위를 하지 않고
+js 코드에서만 불러와서 적용이 안 된 상황이다.
+
+#### 2. style-loader
+
+위와 같이 css 가 적용이 안되는 상황 때문에 나온 것이 style-loader 다.
+style-loader 는 js code 로 변경된 스타일 코드를 html에 넣어주는 로더이다.
+
+css 코드를 모듈로 사용하거나 webpack으로 번들링 하려면 css로더와 style로더를 한꺼번에 사용해야 한다.
+
+먼저 스타일 로더를 다운로드 받는다.
+
+```
+$ npm i -D style-loader@1
+```
+
+다운받은 후 로더를 웹팩에 적용 해 주면 다음과 같다.
+
+```
+  {
+     test: /\.css$/,
+     use: ["style-loader", "css-loader"],
+  }
+```
+
+로더는 한 파일에 대해서 여러개가 적용 될 수 있으며
+순서는 배열의 뒤에서 부터 앞에 이다.
+따라서 css-loader가 먼저 적용 후 style-loader가 적용 된다.
+
+위의 적용 후 빌드 된 화면을 보면 녹색으로 바뀌어 있는 것을 볼 수 있다.

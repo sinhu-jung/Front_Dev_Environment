@@ -15,6 +15,10 @@ module.exports = {
         test: /\.js$/, // 로더가 처리해야될 파일들의 패턴(정규 표현식)
         use: [path.resolve("./my-webpack-loader.js")], //
       },
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"],
+      },
     ],
   },
 };
