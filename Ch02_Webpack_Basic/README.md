@@ -455,4 +455,4 @@ $ npm i -D url-loader // url-loader 는 v5에 지원 중단 돼서 그냥 다운
 url-loader가 파일을 처리 할 때 2kb 이하의 파일은 url-loader 로 처리를 해서 base64로 변환 하고 만약 2kb 이상일 경우 file-loader 로 처리 한다.
 즉 2kb 미만일 경우 js 문자열로 변환하고 2kb 이상일 경우 파일을 복사한다.
 
-[플러그인]
+[플러그인](https://github.com/sinhu-jung/Front_Dev_Environment/blob/main/Ch02_Webpack_Basic/PlUGIN.md)
