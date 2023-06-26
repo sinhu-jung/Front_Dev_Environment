@@ -71,3 +71,29 @@ module.exports = MyWebpackPlugin;
 compiler.plugin() 함수의 두번재 인자 콜백함수는 emit 이벤트가 발생하면 실행된다.
 번들된 결과가 compilation 객체에 들어 있는데 compilation.assets['main.js'].source() 함수로 접근할 수 있다.
 실행하면 터미널에 번들링된 결과물을 확인할 수 있다.
+
+# 자주 사용하는 플러그인
+
+## 1. BannerPlugin
+
+커스텀으로 만들었던 my-webpack-plugin 이 실제로는 BannerPlugin 이라고 불린다.
+결과물에 빌드 정보나 커밋 버전같은 걸 추가할 수 있으며 웹팩이 기본적으로 제공하고 있는 플러그인 이다.
+
+- webpack.config.js
+
+```
+const webpack = require("webpack");
+const childProcess = require("child_process");
+
+  plugins: [
+    new webpack.BannerPlugin({
+      banner: `
+        Build Date: ${new Date().toLocaleString()}
+        Commit Version: ${childProcess.execSync("git rev-parse --short HEAD")}
+        Author: ${childProcess.execSync("git config user.name")}
+      `,
+    }),
+  ],
+```
+
+node_module 에 childProcess 를 사용하면 터미널에 명령어를 친 결과물을 얻을 수 있다.
