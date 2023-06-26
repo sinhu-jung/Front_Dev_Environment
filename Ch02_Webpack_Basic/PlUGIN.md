@@ -97,3 +97,27 @@ const childProcess = require("child_process");
 ```
 
 node_module 에 childProcess 를 사용하면 터미널에 명령어를 친 결과물을 얻을 수 있다.
+
+## 2. DefinePlugin
+
+어플리케이션은 개발환경과 운영환경으로 나눠서 운영한다.
+가령 환경에 따라 API 서버 주소가 다를 수 있다.
+같은 소스 코드를 두 환경에 배포하기 위해서는 이러한 환경 의존적인 정보를 소스가 아닌 곳에서 관리하는 것이 좋다.
+배포할 때마다 코드를 수정하는 것은 곤란하기 때문이다.
+
+웹팩은 이러한 환경 정보를 제공하기 위해 DefinePlugin을 제공한다.
+
+- webpack.config.js
+
+```
+plugins: [
+    new webpack.DefinePlugin({
+      TWO: JSON.stringify("1+1"),
+      "api.domain": JSON.stringify("http://dev.api.domain.com"),
+    }),
+]
+```
+
+빈 객체를 전달해도 기본적으로 넣어주는 값이 있다.
+노드 환경정보인 process.env.NODE_ENV 인데 웹팩 설정의 mode에 설정한 값이 여기에 들어간다.
+"development"를 설정했기 때문에 어플리케이션 코드에서 process.env.NODE_ENV 변수로 접근하면 "development" 값을 얻을 수 있다.
