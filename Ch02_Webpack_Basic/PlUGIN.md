@@ -217,3 +217,42 @@ module.exports = {
 ```
 
 ## 5. MiniCssExtractPlugin
+
+스타일시트가 점점 많아지면 하나의 자바스크립트 결과물로 만드는 것이 부담일 수 있다. 번들 결과에서 스트일시트 코드만 뽑아서 별도의 CSS 파일로 만들어 역할에 따라 파일을 분리하는 것이 좋다.
+브라우져에서 큰 파일 하나를 내려받는 것 보다, 여러 개의 작은 파일을 동시에 다운로드하는 것이 더 빠르다.
+
+개발 환경에서는 CSS를 하나의 모듈로 처리해도 상관없지만 프로덕션 환경에서는 분리하는 것이 효과적이다. MiniCssExtractPlugin은 CSS를 별로 파일로 뽑아내는 플러그인이다.
+
+- MiniCssExtractPlugin 설치
+
+```
+$ npm i -D mini-css-extract-plugin
+```
+
+- webpack.config.js:
+
+```
+  const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+
+    ...(process.env.NODE_ENV === "production"
+      ? [new MiniCssExtractPlugin({ filename: "[name].css" })]
+      : []),
+```
+
+개발 환경에서는 css-loader에의해 자바스크립트 모듈로 변경된 스타일시트를 적용하기위해 style-loader를 사용했다. 반면 프로덕션 환경에서는 별도의 CSS 파일으로 추출하는 플러그인을 적용했으므로 다른 로더가 필요하다.
+
+- webpack.config.js:
+
+```
+      {
+        test: /\.css$/,
+        use: [
+          process.env.NODE_ENV === "production"
+            ? MiniCssExtractPlugin.loader
+            : "style-loader",
+          "css-loader",
+        ],
+      },
+```
+
+filename에 설정한 값으로 아웃풋 경로에 CSS 파일이 생성되는 것을 볼 수 있다.
