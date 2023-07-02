@@ -10,4 +10,188 @@
 바벨은 ECMAScript2015+로 작성한 코드를 모든 브라우져에서 동작하도록 호환성을 지켜준다.
 뿐만아니라 타입스크립트, JSX처럼 다른 언어로 분류되는 것도 포함한다.
 
-## 바벨의 기본 동작
+# 바벨의 기본 동작
+
+- babel 설치
+
+```
+$npm i -D @babel/core @babel/cli
+```
+
+- babel 실행
+
+```
+npx babel app.js
+const alert = msg => window.alert(msg);
+```
+
+바벨은 세단계로 빌드를 진행한다.
+
+1. 파싱(Parsing)
+2. 변환(Transforming)
+3. 출력(Printing)
+
+- 파싱
+  파싱은 토큰을 받아 분해한다.
+  예를들어 위의 바벨 실행 코드를 보면 const 라는 토큰 alert 라는 토큰 등호 토큰으로 분해한다. 이 과정을 파싱이라고 한다.
+
+- 변환
+  변환은 es6로 돼 있는 코드를 es5 로 변환시키는 단계이다.
+
+- 출력
+  변경된 결과물을 출력하는 단계이다.
+
+하지만 위의 결과물은 파싱을 했지만 변환이 안 돼었다.
+변환하기 전과 후의 코드가 같기 때문이다.
+
+# 플러그인
+
+- 바벨에는 플러그인 이라는게 있는데 이 플러그인이 변환을 담당한다.
+
+## 1. 커스텀 플러그인
+
+- my-babel-plugin.js
+
+```
+module.exports = function myBabelPlugin() {
+  return {
+    visitor: {
+      Identifier(path) {
+        const name = path.node.name;
+
+        // 바벨이 만든 AST 노드를 출력한다
+        console.log("Identifier() name:", name);
+
+        // 변환작업: 코드 문자열을 역순으로 변환한다
+        path.node.name = name.split("").reverse().join("");
+      },
+    },
+  };
+};
+```
+
+플러그인 형식은 visitor 객체를 가진 함수를 반환해야 한다.
+따라서 이 객체는 바벨이 파싱하여 만든 추상 구문 트리(AST)에 접근할 수 있는 메소드를 제공한다.
+그중 Identifier() 메소드의 동작 원리를 살펴보는 코드다.
+
+```
+$ npx babel app.js --plugins ./my-babel-plugin.js
+Identifier() name: alert
+Identifier() name: msg
+Identifier() name: window
+Identifier() name: alert
+Identifier() name: msg
+const trela = gsm => wodniw.trela(gsm);
+```
+
+Identifier() 메소드로 들어온 인자 path에 접근하면 코드 조각에 접근할 수 있으며 path.node.name의 값을 변경하는데 문자를 뒤집는 코드다.
+결과의 마지막 줄에서 보는것 처럼 이 코드의 문자열 순서가 역전되었다.
+
+ECMASCript2015로 작성한 코드를 인터넷 익스플로러에서 돌리기 위해 const 코드를 var로 변경하는 플러그인을 만들어 보면 다음과 같다.
+
+```
+module.exports = function myBabelPlugin() {
+ return {
+   visitor: {
+     // https://github.com/babel/babel/blob/master/packages/babel-plugin-transform-block-scoping/src/index.js#L26
+     VariableDeclaration(path) {
+       console.log("VariableDeclaration() kind:", path.node.kind); // const
+
+       // const => bar 변환
+       if (path.node.kind === "const") {
+         path.node.kind = "var";
+       }
+     },
+   },
+ };
+};
+
+```
+
+이번에는 vistor 객체에 VariableDeclaration() 메소드를 정의했다.
+path에 접근해 보면 키워드가 잡히는 걸 알 수 있다.
+path.node.kind가 const 일 경우 var로 변환하는 코드다.
+
+## 2. 플러그인 사용
+
+es6 에서 es5 로 변환하는 작업이 block-scoping 플러그인이다.
+
+- 설치
+
+```
+$ npm i -D @babel/plugin-transform-block-scoping
+```
+
+플러그인 설치후 실행해보면 커스텀 플러그인과 같은 결과를 도출한다.
+
+```
+npx babel app.js --plugins @babel/plugin-transform-block-scoping
+
+var alert = msg => window.alert(msg);
+```
+
+화살표 함수를 지원하지 않는 브라우저가 있을 수 있다.
+따라서 이 부분도 지원하는 플러그인이 있는데 그것이 arrow-functions 플러그인 이다.
+
+- 설치
+
+```
+$ npm i -D @babel/plugin-transform-arrow-functions
+```
+
+- 실행
+
+```
+$ npx babel app.js  --plugins @babel/plugin-transform-block-scoping  --plugins @babel/plugin-transform-arrow-functions
+
+var alert = function (msg) {
+  return window.alert(msg);
+};
+```
+
+ECMAScript5에서부터 지원하는 엄격 모드를 사용하는 것이 안전하기 때문에 "use strict" 구문을 추가해야 한다.
+
+- strict-mode 플러그인을 설치
+
+```
+$ npm i -D @babel/plugin-transform-strict-mode
+```
+
+- 실행
+
+```
+$ npx babel app.js  --plugins @babel/plugin-transform-block-scoping  --plugins @babel/plugin-transform-arrow-functions --plugins @babel/plugin-transform-strict-mode
+
+"use strict";
+
+var alert = function (msg) {
+  return window.alert(msg);
+};
+```
+
+플러그인이 추가 될 수록 명령어가 점점 길어 지는 것을 볼 수 있다.
+설정 파일로 분리하여 사용해보면 다음과 같다.
+
+- babel.config.js
+
+```
+module.exports = {
+  plugins: [
+    "@babel/plugin-transform-block-scoping",
+    "@babel/plugin-transform-arrow-functions",
+    "@babel/plugin-transform-strict-mode",
+  ],
+};
+```
+
+- 다시 바벨 실행
+
+```
+npx babel app.js
+
+"use strict";
+
+var alert = function (msg) {
+  return window.alert(msg);
+};
+```
