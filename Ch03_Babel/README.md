@@ -195,3 +195,76 @@ var alert = function (msg) {
   return window.alert(msg);
 };
 ```
+
+# 프리셋
+
+ECMAScript2015+으로 코딩할 때 필요한 플러그인을 일일이 설정하는 일은 무척 지난한 일이다.
+코드 한 줄 작성하는데도 세 개 플러그인 세팅을 했으니 말이다.
+목적에 맞게 여러가지 플러그인을 세트로 모아놓은 것을 프리셋 이라고 한다.
+
+## 1. 커스텀 프리셋
+
+- my-babel-preset.js
+
+```
+module.exports = function myBabelPreset() {
+  return {
+    plugins: [
+      "@babel/plugin-transform-block-scoping",
+      "@babel/plugin-transform-arrow-functions",
+      "@babel/plugin-transform-strict-mode",
+    ],
+  };
+};
+
+```
+
+- babel.config.js 수정
+
+```
+module.exports = {
+  presets: ["./my-babel-preset.js"],
+};
+```
+
+실행해보면 동일한 결과를 출력하는 것을 볼 수있다.
+
+## 2. 프리셋 사용하기
+
+바벨은 목적에 따라 몇가지 프리셋을 제공한다
+
+- preset-env
+- preset-flow
+- preset-react
+- preset-typescript
+
+- preset-env
+  preset-env는 ECMAScript2015+를 변환할 때 사용한다. 바벨 7 이전 버전에는 연도별로 각 프리셋을 제공했지만(babel-reset-es2015, babel-reset-es2016, babel-reset-es2017, babel-reset-latest) 지금은 env 하나로 합쳐졌다.
+
+preset-flow, preset-react, preset-typescript는 flow, 리액트, 타입스크립트를 변환하기 위한 프리셋이다.
+
+- preset-env 설치
+
+```
+$ npm i -D @babel/preset-env
+```
+
+- 바벨 설정 변경
+
+```
+module.exports = {
+  presets: ["@babel/preset-env"],
+};
+```
+
+- 바벨 실행
+
+```
+$ npx babel app.js
+
+"use strict";
+
+var alert = function alert(msg) {
+  return window.alert(msg);
+};
+```
