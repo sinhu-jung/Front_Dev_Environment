@@ -268,3 +268,69 @@ var alert = function alert(msg) {
   return window.alert(msg);
 };
 ```
+
+# env 프리셋 설정과 폴리필
+
+## 1. 타겟 브라우저
+
+코드가 크롬 최신 버전(2019년 12월 기준)만 지원하다고 했을때 다른 브라우저를 위한 코드 변환은 불필요하다.
+target 옵션에 브라우져 버전명만 지정하면 env 프리셋은 이에 맞는 플러그인들을 찾아 최적의 코드를 출력한다.
+
+- babel.config.js
+
+```
+module.exports = {
+  presets: [
+    [
+      "@babel/preset-env",
+      {
+        targets: {
+          chrome: "79", // 크롬 79까지 지원하는 코드를 만든다
+        },
+      },
+    ],
+  ],
+};
+```
+
+크롬은 블록 스코핑과 화살표 함수를 지원하기 때문에 코드를 변환하지 않고 이러한 결과물을 도출한다.
+
+## 2. 폴리필
+
+ECMASCript2015의 Promise 객체를 사용하는 코드를 작성하면 다음과 같다.
+
+- app.js
+
+```
+new Promise()
+```
+
+플러그인이 프라미스를 ECMAScript5 버전으로 변환할 것으로 기대했는데 예상과 다르다. 바벨은 ECMAScript2015+를 ECMAScript5 버전으로 변환할 수 있는 것만 빌드한다. 그렇지 못한 것들은 "폴리필"이라고부르는 코드조각을 추가해서 해결한다.
+
+가령 ECMAScript2015의 블록 스코핑은 ECMASCript5의 함수 스코핑으로 대체할 수 있다. 화살표 함수도 일반 함수로 대체할 수 있다. 이런 것들은 바벨이 변환해서 ECMAScript5 버전으로 결과물을 만든다.
+
+한편 프라미스는 ECMAScript5 버전으로 대체할 수 없다. 다만 ECMAScript5 버전으로 구현할 수는 있다
+
+env 프리셋은 폴리필을 지정할 수 있는 옵션을 제공한다.
+
+```
+module.exports = {
+  presets: [
+    [
+      "@babel/preset-env",
+      {
+        useBuiltIns: "usage", // 폴리필 사용 방식 지정
+        corejs: {
+          // 폴리필 버전 지정
+          version: 2,
+        },
+      },
+    ],
+  ],
+};
+
+```
+
+useBuiltIns는 어떤 방식으로 폴리필을 사용할지 설정하는 옵션이다. "usage" , "entry", false 세 가지 값을 사용하는데 기본값이 false 이므로 폴리필이 동작하지 않았던 것이다. 반면 usage나 entry를 설정하면 폴리필 패키지 중 core-js를 모듈로 가져온다(이전에 사용하던 babel/polyfile은 바벨 7.4.0부터 사용하지 않음).
+
+corejs 모듈의 버전도 명시하는데 기본값은 2다. 버전 3과 차이는 확실히 잘 모르겠다. 이럴 땐 그냥 기본값을 사용하는 편이다.
