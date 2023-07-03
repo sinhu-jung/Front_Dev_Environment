@@ -334,3 +334,40 @@ module.exports = {
 useBuiltIns는 어떤 방식으로 폴리필을 사용할지 설정하는 옵션이다. "usage" , "entry", false 세 가지 값을 사용하는데 기본값이 false 이므로 폴리필이 동작하지 않았던 것이다. 반면 usage나 entry를 설정하면 폴리필 패키지 중 core-js를 모듈로 가져온다(이전에 사용하던 babel/polyfile은 바벨 7.4.0부터 사용하지 않음).
 
 corejs 모듈의 버전도 명시하는데 기본값은 2다. 버전 3과 차이는 확실히 잘 모르겠다. 이럴 땐 그냥 기본값을 사용하는 편이다.
+
+# 웹팩으로 통합
+
+실무에서는 바벨을 직접 사용하지는 않고 웹팩으로 통합해서 사용한다.
+로더 형태로 제공하는데 babel-loader 로 알려져 있다.
+
+- 패키지 설치
+
+```
+$ npm i -D babel-loader
+```
+
+- 웹팩 설정에 로더 추가
+
+```
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: "babel-loader", // 바벨 로더를 추가한다
+      },
+    ],
+  },
+}
+```
+
+폴리필 사용 설정을 했다면 core-js도 설치해야한다. 웹팩은 바벨 로더가 만든 아래 코드를 만나면 core-js를 찾을 것이기 때문이다.
+
+코어 js 설치
+
+```
+$ npm i core-js@2
+```
+
+그리고 웹팩으로 빌드하면 정상적으로 빌드가 되는것을 볼 수 있다.

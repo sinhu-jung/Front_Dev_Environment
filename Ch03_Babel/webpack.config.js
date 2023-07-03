@@ -8,7 +8,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 module.exports = {
   mode: "development",
   entry: {
-    main: "./src/app.js",
+    main: "./app.js",
   },
   output: {
     filename: "[name].js",
@@ -16,10 +16,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.js$/, // 로더가 처리해야될 파일들의 패턴(정규 표현식)
-        use: [path.resolve("./my-webpack-loader.js")], //
-      },
       {
         test: /\.css$/,
         use: [
@@ -29,14 +25,6 @@ module.exports = {
           "css-loader",
         ],
       },
-      // {
-      //   test: /\.(png|jpg|gif|svg)$/,
-      //   loader: "file-loader",
-      //   options: {
-      //     publicPath: "./dist/",
-      //     name: "[name].[ext]?[hash]",
-      //   },
-      // },
       {
         test: /\.(png|jpg|gif|svg)$/,
         loader: "url-loader",
@@ -44,6 +32,11 @@ module.exports = {
           name: "[name].[ext]?[hash]",
           limit: 20000, // 20kb
         },
+      },
+      {
+        test: /\.js$/,
+        loader: "babel-loader",
+        exclude: /node_modules/,
       },
     ],
   },
