@@ -22,7 +22,8 @@
     "webpack-cli": "^3.3.10"
   },
   "scripts": {
-    "build": "webpack --progress"
+    "build": "webpack --progress",
+    "lint": "eslint src --fix"
   },
   "repository": {
     "type": "git",
