@@ -115,3 +115,90 @@ npx eslint --init
 답변에 따라 .eslintrc 파일을 자동으로 만들 수 있다.
 
 # Prettier
+
+프리티어는 코드를 가독성이 좋게 만드는 역할을 한다.
+ESLint의 포맷팅 부분을 강화한 것이라 생각하면 될 것 같다.
+
+- 프리티어 설치
+
+```
+$ npm i -D prettier
+```
+
+설치 후 프리티어로 검사를 해 보면 다음과 같다
+
+```
+- app.js
+console.log('hello world')
+
+npx prettier app.js --write
+
+- app.js
+console.log('hello world');
+
+```
+검사를 하면 세미콜론이 붙어서 나온 것을 볼 수 있다.
+
+프리티어의 강점은 ESLint 가 고칠 수 없는 부분도 고쳐준다.
+
+```
+console.log("----------------매 우 긴 문 장 입 니 다 80자가 넘 는 코 드 입 니 다.----------------");
+```
+
+ESLint는 max-len 규칙을 이용해 위 코드를 검사하고 결과만 알려 줄 뿐 수정하는 것은 개발자의 몫이다. 
+반면 프리티어는 어떻게 수정해야할지 알고 있기 때문에 아래처럼 코드를 다시 작성한다.
+
+```
+console.log(
+  "----------------매 우 긴 문 장 입 니 다 80자가 넘 는 코 드 입 니 다.----------------"
+);
+```
+
+## 통합방법
+
+포맷팅은 프리티어에게 맡기더라도 코드 품질과 관련된 검사는 ESLint의 몫이기 때문에 ESLint 는 여전히 사용 해야 한다.
+따라서 ESLint 와 Prettier 를 같이 사용하기 위한 방법은 다음과 같다.
+
+- 패키지 설치
+
+```
+$ npm i -D eslint-config-prettier
+```
+
+- 설정 추가
+
+```
+// .eslintrc.js
+{
+  extends: [
+    "eslint:recommended",
+    "eslint-config-prettier"
+  ]
+}
+```
+
+ESLint는 중복 세미콜론 사용을 검사한다. 
+이것은 프리티어도 마찬가지다. 
+따라서 어느 한쪽에서는 규칙을 꺼야하는데 eslint-config-prettier를 extends 하면 중복되는 ESLint 규칙을 비활성화 한다.
+
+ESLint 와 Prettier 둘다 실행을 계속 시켜야 되는 것은 귀찮은 작업이다.
+그래서 한방에 실행 시키는 방법을 보면 다음과 같다.
+
+- 패키지 설치
+
+```
+$ npm i -D eslint-plugin-prettier
+```
+
+- 설정 파일에서 plugins와 rules에 설정 추가
+```
+// .eslintrc.js
+{
+  plugins: [
+    "prettier"
+  ],
+  rules: {
+    "prettier/prettier": "error"
+  },
+}
+```

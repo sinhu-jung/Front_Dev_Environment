@@ -1,2 +1,3 @@
+var foo = "";
+
 console.log();
-(function() {})();
