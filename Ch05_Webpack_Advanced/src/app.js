@@ -1,15 +1,12 @@
-// import * as math from "./math.js";
-// import { sum } from "./math.js";
 import "../css/app.css";
-import nyancat from "../image/nyancat.jpg";
+import axios from "axios";
 
-// console.log(math.sum(1, 2));
-// console.log(sum(3, 4));
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.body.innerHTML = `
-        <img src="${nyancat}" />
-    `;
+document.addEventListener("DOMContentLoaded", async () => {
+  const res = await axios.get("/api/users");
+  console.log(res);
+  document.body.innerHTML = res.data.map((user) => {
+    return `<div>${user.id}: ${user.name}</div>`;
+  });
 });
 
 console.log(process.env.NODE_ENV);
