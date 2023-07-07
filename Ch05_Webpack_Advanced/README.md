@@ -189,3 +189,43 @@ module.exports = {
   },
 }
 ```
+
+## 핫 모듈 리플레이스먼트
+
+핫 모듈 리플레이스 먼트는 변경한 모듈만 화면에서 갈아 치우는 것이다.
+즉 전체 화면을 리프레쉬 하지 않고 변경된 부분만 갈아 치우기 때문에 다른 모듈은 이전 데이터를 유지한다.
+
+### 핫 모듈 설정
+
+핫 모듈을 설정 하는 부분은 webpack.config.js 의 devServer 에서 hot 속성을 켜면 된다.
+
+- webpack.config.js
+```
+module.exports = {
+  devServer = {
+    hot: true,
+  },
+}
+```
+
+- app.js
+
+```
+if (module.hot) {
+  console.log("핫모듈 켜짐");
+
+  module.hot.accept("./result", async () => {
+    console.log("result 모듈 변경 됨");
+    resultEl.innerHTML = await result.render();
+  });
+
+  module.hot.accept("./form", () => {
+    console.log("form 모듈 변경 됨");
+    formEl.innerHTML = form.render();
+  });
+}
+```
+
+devServer.hot 옵션을 켜면 웹팩 개발 서버 위에서 module.hot 객체가 생성된다. 이 객체의 accept() 메소드는 감시할 모듈과 콜백 함수를 인자로 받는다. 위에서는 app.js 모듈을 감시하고 변경이 있으면 전달한 콜백 함수가 동작하도록 했다.
+이렇게 동작 하는 것을 HMR 인터페이스 라고 부른다.
+대표적인 로더 중에는 style-loader가 HMR이 적용 돼 있다.
