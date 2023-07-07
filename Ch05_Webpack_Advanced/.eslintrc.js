@@ -21,5 +21,7 @@ module.exports = {
     sourceType: "module",
   },
   plugins: [],
-  rules: {},
+  rules: {
+    "prettier/prettier": ["error", { endOfLine: "auto" }],
+  },
 };
