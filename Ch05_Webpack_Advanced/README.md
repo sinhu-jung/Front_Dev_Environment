@@ -296,8 +296,8 @@ const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin")
 
 module.exports = {
   optimization: {
-    minimizer: mode === "production" ? [new OptimizeCSSAssetsPlugin()] : [],
-  },
+   minimizer: mode === "production" ? [new OptimizeCSSAssetsPlugin()] : [],
+  }, 
 }
 ```
 
@@ -416,4 +416,24 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   ```
   $ npm i -D copy-webpack-plugin
+  ```
+
+  - 웹팩 설정
+  ```
+  const CopyPlugin = require("copy-webpack-plugin")
+
+      new CopyPlugin({
+      patterns: [
+        {
+          from: "./node_modules/axios/dist/axios.min.js",
+          to: "./axios.min.js", // 목적지 파일에 들어간다
+        },
+      ],
+    }),
+  ```
+
+  마지막으로 index.html에서는 axios를 로딩하는 코드를 추가한다.
+
+  ```
+    <script type="text/javascript" src="axios.min.js"></script>
   ```
